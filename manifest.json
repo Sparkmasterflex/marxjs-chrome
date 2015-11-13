@@ -1,15 +1,19 @@
 {
   "manifest_version": 2,
 
-  "name": "MarxJS",
+  "name": "Marx.js",
   "description": "MarxJS is for developers building web applications with long forms, giving them the ability to populate any and all the fields in their forms easily with Marx Brothers' names, years of their movies and quotes from those movies.",
   "version": "0.1",
 
-  "permissions": [
-    "http://marxjs.com/"
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["javascripts/jquery.min.js", "javascripts/marx.js"],
+      "css": ["stylesheets/marx.css"]
+    }
   ],
   "browser_action": {
-    "default_icon": "groucho.png",
+    "default_icon": "/images/groucho.png",
     "default_popup": "popup.html"
   }
 }

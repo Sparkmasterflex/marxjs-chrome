@@ -1,0 +1,59 @@
+@import url(reset.css);
+body.marx-chrome-extension {
+  font-size: 62.5%;
+  font-family: Arial, sans-serif; }
+  body.marx-chrome-extension p, body.marx-chrome-extension li, body.marx-chrome-extension a, body.marx-chrome-extension input {
+    font-size: 1.6em; }
+    body.marx-chrome-extension p p, body.marx-chrome-extension p li, body.marx-chrome-extension p a, body.marx-chrome-extension p input, body.marx-chrome-extension li p, body.marx-chrome-extension li li, body.marx-chrome-extension li a, body.marx-chrome-extension li input, body.marx-chrome-extension a p, body.marx-chrome-extension a li, body.marx-chrome-extension a a, body.marx-chrome-extension a input, body.marx-chrome-extension input p, body.marx-chrome-extension input li, body.marx-chrome-extension input a, body.marx-chrome-extension input input {
+      font-size: 1em; }
+
+:focus {
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  outline: 0; }
+
+.marx-js-controls {
+  *zoom: 1;
+  padding: 30px;
+  width: 600px; }
+  .marx-js-controls:before, .marx-js-controls:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */ }
+  .marx-js-controls:after {
+    clear: both; }
+  .marx-js-controls .marx-standard-controls,
+  .marx-js-controls .marx-advanced-controls {
+    width: 48%;
+    float: left; }
+  .marx-js-controls .marx-advanced-controls {
+    float: right; }
+  .marx-js-controls h4 {
+    font-size: 24px;
+    margin-bottom: 15px; }
+
+.marx-js-group {
+  *zoom: 1;
+  padding: 15px 0; }
+  .marx-js-group:before, .marx-js-group:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */ }
+  .marx-js-group:after {
+    clear: both; }
+  .marx-js-group p {
+    width: 80%;
+    float: left; }
+  .marx-js-group a {
+    float: right;
+    padding: 4px 8px;
+    color: #333;
+    text-decoration: none;
+    background-color: #ddd; }
+    .marx-js-group a:hover {
+      background-color: #ccc; }
+
+/*# sourceMappingURL=marx.css.map */
