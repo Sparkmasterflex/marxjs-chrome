@@ -1,5 +1,5 @@
-window.Marx = () ->
-  @marx_json = {
+window.Marx = ->
+  marx_json:
     text: [ "Love Happy", "A Night in Casablanca", "Room Service", "A Day at the Races", "Duck Soup", "Horse Feathers", "Monkey Business", "Animal Crackers", "The Cocoanuts", "Night at the Opera", "Sam", "Grunion", "Detective", "Faustino", "Harpo", "Marx", "Ronald", "Kornblow", "Rusty", "Stubel's valet", "Corbaccio", "Owner of the Yellow Camel company" ],
     number: [ 1949,1946,1938,1937,1933,1932,1931,1930,1929,1935],
     textarea: [
@@ -18,12 +18,7 @@ window.Marx = () ->
       "Groucho: Have you ever had any experience as a kidnapper? Chico: You bet. You know what I do when I kidnap somebody? First I call them up on the telephone and then I send them my chauffeur. Groucho: Oh, you got a chauffeur? Chico: Yeah. Groucho: What kind of a car do you got? Chico: Oh, I no gotta car, I just got a chauffeur. Groucho: Well maybe I'm crazy, but when you got a chauffeur, aren't you supposed to have a car? Chico: I had one, but you see it cost too much to keep a car and the chauffeur. So I sold the car. Groucho: Well that shows how little I know. I would have kept the car and sold the chauffeur.",
       "This is some football game and I wish you were here. In fact I wish you were here instead of me. Last week I told you that Mrs. Moskowitz was expecting a blessed event. Well last night Mrs. Moskowitz had twins. Ok, Mr. Moskowitz!"
     ]
-  }
 
-  @initialize()
-
-
-$.extend Marx.prototype,
   effected:
     inputs: 0
     texareas: 0
@@ -32,200 +27,71 @@ $.extend Marx.prototype,
     radio_buttons: 0
     hidden_fields: 0
 
-  initialize: () ->
-    this.$el = $('.marx-js-controls')
-    console.log this.$('.marx-standard-controls a')
-    this.$('.marx-standard-controls a').click (e) => @popluate_selected_fields(e)
-    this.$('.marx-advanced-controls a').click (e) => @advanced_actions(e)
+popluate_selected_fields = (e) ->
+  switch e.target.getAttribute('class')
+    when 'populate-textareas'
+      console.log 'texareas'
+      # this.populate_textareas()
+    when 'populate-inputs' then populate_inputs()
+    when 'populate-checkboxes'
+      console.log 'check'
+      # this.populate_checkboxes()
+    when 'populate-radios'
+      console.log 'radios'
+      # this.populate_radios()
+    when 'populate-selects'
+      console.log 'selects'
+      # this.populate_selects()
+    else
+      console.log 'whole form'
+      # this.populate_whole_form()
+
+populate_inputs = ->
+  query = ""
+  types = ['text', 'email', 'number', 'password', 'url', 'date']
+  for i in [0..types.length-1]
+    query += "input[type=#{types[i]}], "
+
+  js_code = """
+    var i, text_arr, inputs, elm, _i, _ref;
+
+    text_arr = ["#{marx.marx_json["text"].join("\", \"")}"];
+    num_arr = ["#{marx.marx_json["number"].join("\", \"")}"];
+    inputs = document.querySelectorAll('#{query.replace(/,\s$/, '')}');
+    for(var i = 0; i < inputs.length; i++) {
+      elm = inputs[i];
+      var rand = Math.floor(Math.random() * text_arr.length);
+      switch(elm.getAttribute('type')) {
+        case 'text':
+        case 'password':
+          elm.value = text_arr[rand];
+          break;
+        case 'email':
+          var rand_2 = Math.floor(Math.random() * text_arr.length),
+              email = text_arr[rand].toLowerCase().replace(/\\s/g, '') + '@' + text_arr[rand_2].toLowerCase().replace(/\\s/g, '') + '.com';
+          elm.value = email;
+          break;
+        case 'number':
+          elm.value = num_arr[rand];
+          break;
+        case 'url':
+          elm.value = "http://" + text_arr[rand].toLowerCase().replace(/\\s/g, '') + ".com";
+          break;
+        case 'date':
+          elm.value = num_arr[rand] + "-01-01";
+          break;
+      }
+    }
+  """
+  chrome.tabs.executeScript null, {code: js_code}
+  window.close();
 
 
-  $: (el) -> this.$el.find(el)
+document.addEventListener 'DOMContentLoaded', () ->
+  window.marx = new Marx()
 
+  standard_links = document.querySelectorAll('.marx-standard-controls a')
 
-  ###=========================
-      POPULATE FORM METHODS
-  =========================###
-  populate_whole_form: (e) ->
-    this.populate_inputs()
-    this.populate_textareas()
-    this.populate_checkboxes()
-    this.populate_radios()
-    this.populate_selects()
-    false
+  for i in [0..standard_links.length-1]
+    standard_links[i].addEventListener 'click', popluate_selected_fields
 
-  populate_inputs: ->
-    @effected.inputs = 0
-    $.each $("input"), (i, input) =>
-      unless $(input).val() isnt "" or $(input).hasClass 'no-populate'
-        @effected.inputs += 1 if ['checkbox', 'radio', 'hidden'].indexOf $(input).attr('type') < 0
-        obj = this.get_random()
-        brother = JSON.parse(obj.brother)
-        movie = JSON.parse(obj.movie)
-        strings = [brother.name, movie.name, obj.first_name, obj.last_name, obj.description].filter () -> true
-        value = switch $(input).attr('type')
-          when 'number' then movie.year
-          when 'email' then "#{brother.name.toLowerCase().replace(/\s/g, '')}@#{movie.name.toLowerCase().replace(/\s/g, '')}.com"
-          when 'url' then "http://#{movie.name.toLowerCase().replace(/\s/g, '')}.com"
-          when 'date' then "#{movie.year}-01-01"
-          else
-            strings[Math.floor(Math.random() * strings.length)]
-        $(input).attr('data-marx-d', true).val value
-
-  populate_textareas: ->
-    this.effected.textareas = 0
-    $.getJSON "http://marxjs.com/quotes", (data) =>
-      $.each $("textarea"), (i, input) =>
-        @effected.textareas += 1
-        $(input).attr('data-marx-d', true).val data[Math.floor(Math.random() * data.length)].body
-
-
-  populate_checkboxes: ->
-    this.effected.check_boxes = 0
-    names = []
-    $.each $("input[type=checkbox]"), (i, input) ->
-      names.push $(input).attr('name') unless names.indexOf($(input).attr('name')) >= 0
-    $.each names, (i, name) =>
-      checked = if Math.floor(Math.random() * 2) is 1 then true else false
-      clean_name = name.replace(/\[/g, '\\[').replace(/\]/g, '\\]')
-      $("input[name=#{clean_name}]").attr('data-marx-d', true).attr('checked', checked)
-      @effected.check_boxes += 1 if checked
-
-
-
-  populate_radios: ->
-    this.effected.radio_buttons = 0
-    names = []
-    $("input[type=radio]").each (i, input) -> names.push $(input).attr('name') unless names.indexOf($(input).attr('name')) >= 0
-    $.each names, (i, name) =>
-      clean_name = name.replace(/\[/g, '\\[').replace(/\]/g, '\\]')
-      total = $("input[name=#{clean_name}]").length
-      $("input[name=#{name}]:eq(#{Math.floor(Math.random() * total)})").attr('data-marx-d', true).attr('checked', true)
-      @effected.radio_buttons += 1
-
-
-  populate_selects: ->
-    this.effected.selects = 0
-    $("select").each (i, select) =>
-      @effected.selects += 1
-      total = $(select).attr('data-marx-d', true).find('option').length
-      rand = Math.floor(Math.random() * total)
-      $opt = $(select).find("option:eq(#{rand})")
-      if $opt.attr('value')? and $opt.attr('value') isnt ""
-        $opt.attr('selected', true)
-      else
-        $opt.next('option').attr('selected', true)
-
-  toggle_hidden_fields: ->
-    this.effected.hidden_fields = 0
-    $("input[data-marx-hidden=true]").each (i, input) =>
-      type = if $(input).attr('type') is 'hidden' then 'text' else 'hidden'
-      $(input).attr('type', type)
-      @effected.hidden_fields += 1
-
-    $("input[type=hidden]").each (i, hidden) =>
-      unless $(hidden).data('marx-d')?
-        @effected.hidden_fields += 1
-        $(hidden)
-          .attr('type', 'text')
-          .attr('data-marx-d', true)
-          .attr('data-marx-hidden', true)
-
-
-  trigger_notifications: ->
-    num = 0
-    $.each this.effected, (key, val) =>
-      unless val is 0
-        el = key.replace(/_/, ' ')
-        $note = $("<p class='marx-notification'>#{val} #{el} elements were altered</p>")
-        @$el.append $note
-        $note
-          .css('top', "#{20 + (num*50)}px")
-          .delay(5000 + (num*50))
-          .slideUp 'fast', -> $note.remove()
-        num += 1
-        @effected[key] = 0
-
-  toggle_description: ($link) ->
-    $parent = $link.parent('.marx-js-group')
-    $span = $parent.find('p span')
-    to = $span.data('text')
-    from = $span.text()
-    $span
-      .text(to)
-      .data('text', from)
-
-  generate_ipsum: () ->
-    $('.marx-generated-ipsum').remove()
-    num = this.$('.ipsum input').val()
-    $ipsum = $("""
-      <div class='marx-generated-ipsum #{this.settings.position}'>
-        <h4>Marx Ipsum</h4>
-        <a href='#close' class='marx-ipsum-close'>X</a>
-        <div class='marx-container'></div>
-      </div>
-    """)
-    $('body').append $ipsum
-    $.getJSON "http://marxjs.com/monologues", (data) =>
-      max = if num > data.length then data.length-1 else num
-      monologues = data.sort () -> 0.5 - Math.random()
-      for i in [1..max]
-        $ipsum.find('.marx-container').append "<p>#{monologues[i].body}</p>"
-      $('a.marx-ipsum-close').click (e) ->
-        $('.marx-generated-ipsum').slideUp 'fast'
-        false
-
-  get_random: () -> @marx_json[Math.floor(Math.random() * @marx_json.length)]
-
-
-
-  ###=====================
-           EVENTS
-  =====================###
-  popluate_selected_fields: (e) ->
-    switch $(e.target).attr('class')
-      when 'populate-textareas'
-        this.populate_textareas()
-      when 'populate-inputs'
-        this.populate_inputs()
-      when 'populate-checkboxes'
-        this.populate_checkboxes()
-      when 'populate-radios'
-        this.populate_radios()
-      when 'populate-selects'
-        this.populate_selects()
-      else
-        this.populate_whole_form()
-
-    this.trigger_notifications()
-    false
-
-  advanced_actions: (e) ->
-    switch $(e.target).attr('class')
-      when 'clear-form'
-        $('input[data-marx-d=true], textarea[data-marx-d=true]').val ""
-        $('input[type=checkbox], input[type=radio]').each (i, cb) -> $(cb).removeAttr('checked') if $(cb).data('marx-d')? is $(cb).data('marx-d') and true
-        $('select[data-marx-d=true] option:eq(0)').attr('selected', true)
-      when 'populate-submit'
-        $.when(this.populate_whole_form()).then ->
-          $(e.target).replaceWith "<span class='spinner'>Loading</span>"
-          setTimeout () ->
-            $('form').submit()
-          , 500
-      when 'show-hidden'
-        this.toggle_description $(e.target)
-        $.when(this.toggle_hidden_fields()).then => @trigger_notifications()
-      when 'expand-select'
-        this.toggle_description $(e.target)
-        $('select').each (i, select) =>
-          if $(select).attr('size')?
-            $(select).removeAttr('size')
-          else
-            $(select).attr('size', $(select).find('option').length)
-      when 'random-image'
-        window.location = "http://marxjs.com/get-image"
-      when 'generate-ipsum' then this.generate_ipsum()
-
-    false
-
-$ ->
-  new Marx()
