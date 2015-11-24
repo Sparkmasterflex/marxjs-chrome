@@ -7,10 +7,10 @@ window.Marx = ->
       "Oh you did! Well, this bear was anemic and he couldn't stand the cold climate. He was a rich bear and he could afford to go away for the winter. You take care of your animals and I'll take care of mine! Frozen North, my eye! From the day of our arrival, we led an active life. The first morning saw us up at six, breakfasted, and back in bed at seven - this was our routine for the first three months. We finally got so we were back in bed at six thirty. One morning, I was sitting in front of the cabin, smoking some meat...Yes. There wasn't a cigar store in the neighborhood. As I say, I was sitting in front of the cabin when I bagged six tigers...Six of the biggest tigers...I bagged them. I...I bagged them to go away, but they hung around all afternoon. They were the most persistent tigers I've ever seen.",
       "The principal animals inhabiting the African jungle are moose, elks and Knights of Pythias. Of course, you all know what a moose is. That's big game. The first day, I shot two bucks. That was the biggest game we had. As I say, you all know what a moose is? A moose runs around on the floor, and eats cheese, and is chased by the cats. The elks, on the other hand live up in the hills, and in the spring they come down for their annual convention. It is very interesting to watch them come to the water hole. And you should see them run when they find it is only a water hole. What they're looking for is an 'elk-a-hole'.",
       "One morning, I shot an elephant in my pajamas. How he got in my pajamas, I don't know. Then we tried to remove the tusks. The tusks. That's not so easy to say, tusks. You try that some time...As I say, we tried to remove the tusks, but they were embedded in so firmly that we couldn't bust them. Of course, in Alabama, the Tusk-a-loosa. But, uh, that's entirely ir-elephant to what I was talking about. We took some pictures of the native girls, but they weren't developed. But we're going back again in a couple of weeks.",
-      "Mrs Teasdale, you did a noble deed. I’d be unworthy of the high trust that’s been placed in me if I didn’t do everything within my power to keep our beloved Freedonia in peace with the world.",
-      "I’d be only too happy to meet with Ambassador Trentino, and offer him on behalf of my country the right hand of good fellowship. And I feel sure he will accept this gesture in the spirit of which it is offered.",
-      "But suppose he doesn’t. A fine thing that’ll be. I hold out my hand and he refuses to accept it. That’ll add a lot to my prestige, won’t it? Me, the head of a country, snubbed by a foreign ambassador. Who does he think he is, that he can come here, and make a sap out of me in front of all my people?",
-      "Think of it – I hold out my hand and that hyena refuses to accept it. Why, the cheap ball-pushing swine, he’ll never get away with it I tell you, he’ll never get away with it!",
+      "Mrs Teasdale, you did a noble deed. I'd be unworthy of the high trust that's been placed in me if I didn't do everything within my power to keep our beloved Freedonia in peace with the world.",
+      "I'd be only too happy to meet with Ambassador Trentino, and offer him on behalf of my country the right hand of good fellowship. And I feel sure he will accept this gesture in the spirit of which it is offered.",
+      "But suppose he doesn't. A fine thing that'll be. I hold out my hand and he refuses to accept it. That'll add a lot to my prestige, won't it? Me, the head of a country, snubbed by a foreign ambassador. Who does he think he is, that he can come here, and make a sap out of me in front of all my people?",
+      "Think of it – I hold out my hand and that hyena refuses to accept it. Why, the cheap ball-pushing swine, he'll never get away with it I tell you, he'll never get away with it!",
       "Well gentlemen, what I'm concerned about is the future of this hotel... Well we've got to speed things up. Ah... chef, if a guest orders a three minute egg give it to them in two minutes. If they order a two minute egg give it to them in one minute. If he orders a one minute egg, give him a chicken and let him work it out.",
       "The faculty can keep their seats. There'll be no diving for this cigar. Members of the faculty, faculty members, students of Huxley and Huxley students! I guess that covers everything.",
       "Well I thought my razor was dull until I heard his speech. And that reminds me of a story so dirty I'm ashamed to think of it myself. As I look out over your faces, I can readily understand why this college is flat on its back. The last college I presided over things were slightly different. I was flat on my back. Things kept going from bad to worse, but we all put our shoulders to the wheel and it wasn't long before I was flat on my back again.",
@@ -28,23 +28,34 @@ window.Marx = ->
     hidden_fields: 0
 
 popluate_selected_fields = (e) ->
-  switch e.target.getAttribute('class')
-    when 'populate-textareas'
-      console.log 'texareas'
-      # this.populate_textareas()
-    when 'populate-inputs' then populate_inputs()
-    when 'populate-checkboxes'
-      console.log 'check'
-      # this.populate_checkboxes()
-    when 'populate-radios'
-      console.log 'radios'
-      # this.populate_radios()
-    when 'populate-selects'
-      console.log 'selects'
-      # this.populate_selects()
+  js_code = switch e.target.getAttribute('class')
+    when 'populate-textareas'  then populate_textareas()
+    when 'populate-inputs'     then populate_inputs()
+    when 'populate-checkboxes' then populate_checkboxes()
+    when 'populate-radios'     then populate_radios()
+    when 'populate-selects'    then populate_selects()
     else
-      console.log 'whole form'
-      # this.populate_whole_form()
+      populate_textareas() + "\n" +
+      populate_inputs() + "\n" +
+      populate_checkboxes() + "\n" +
+      populate_radios() + "\n" +
+      populate_selects()
+
+  chrome.tabs.executeScript null, {code: js_code}
+  window.close()
+
+populate_textareas = ->
+  js_code = """
+    var i, paragraphs, textareas, _i, _ref;
+    paragraphs = ["#{marx.marx_json['textarea'].join("\", \"")}"];
+    textareas = document.querySelectorAll('textarea');
+    for (i = _i = 0, _ref = textareas.length-1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+      textareas[i].value = paragraphs[Math.floor(Math.random() * paragraphs.length)];
+    }
+  """
+
+  chrome.tabs.executeScript null, {code: js_code}
+  window.close();
 
 populate_inputs = ->
   query = ""
@@ -86,6 +97,60 @@ populate_inputs = ->
   chrome.tabs.executeScript null, {code: js_code}
   window.close();
 
+populate_checkboxes = ->
+  js_code = """
+    var c, cbs, checkboxes, clean_name, i, n, name, names, _i, _j, _ref, _ref1;
+    names = [];
+    checkboxes = document.querySelectorAll('input[type=checkbox]');
+    for (i = _i = 0, _ref = checkboxes.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+      name = checkboxes[i].getAttribute('name');
+      if(!(names.indexOf(name) >= 0)) { names.push(name); }
+    }
+    for (n = _j = 0, _ref1 = names.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; n = 0 <= _ref1 ? ++_j : --_j) {
+      clean_name = name.replace(/\\[/g, '\\[').replace(/\\]/g, '\\]');
+      cbs = document.querySelectorAll("input[name=" + clean_name + "]");
+
+      var _k, _ref2;
+      for (c = _k = 0, _ref2 = cbs.length - 1; 0 <= _ref2 ? _k <= _ref2 : _k >= _ref2; c = 0 <= _ref2 ? ++_k : --_k) {
+        cbs[c].checked = Math.floor(Math.random() * 2) === 1 ? true : false;
+      }
+    }
+  """
+  chrome.tabs.executeScript null, {code: js_code}
+  window.close()
+
+populate_radios = ->
+  js_code = """
+    var c, cbs, radios, clean_name, i, n, name, names, _i, _j, _ref, _ref1;
+    names = [];
+    radios = document.querySelectorAll('input[type=radio]');
+    for (i = _i = 0, _ref = radios.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+      name = radios[i].getAttribute('name');
+      if(!(names.indexOf(name) >= 0)) { names.push(name); }
+    }
+    for (n = _j = 0, _ref1 = names.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; n = 0 <= _ref1 ? ++_j : --_j) {
+      clean_name = name.replace(/\\[/g, '\\[').replace(/\\]/g, '\\]');
+      by_name = document.querySelectorAll("input[name=" + clean_name + "]");
+      by_name[Math.floor(Math.random() * by_name.length)].checked = true;
+    }
+  """
+  chrome.tabs.executeScript null, {code: js_code}
+  window.close();
+
+populate_selects = ->
+  """
+    var i, js_code, options, rand, selects, _i, _ref;
+    selects = document.querySelectorAll('select');
+    for (i = _i = 0, _ref = selects.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+      options = selects[i].options;
+      rand = Math.floor(Math.random() * options.length);
+      if ((options[rand].getAttribute('value') != null) && options[rand].getAttribute('value') !== "") {
+        options[rand].selected = true;
+      } else {
+        options[rand + 1].selected = true;
+      }
+    }
+  """
 
 document.addEventListener 'DOMContentLoaded', () ->
   window.marx = new Marx()
