@@ -3,7 +3,7 @@
 
   "name": "Marx.js",
   "description": "MarxJS is for developers building web applications with long forms, giving them the ability to populate any and all the fields in their forms easily with Marx Brothers' names, years of their movies and quotes from those movies.",
-  "version": "0.1",
+  "version": "0.2.0",
 
   "permissions": [
       "tabs",
@@ -22,5 +22,10 @@
   "browser_action": {
     "default_icon": "/images/groucho.png",
     "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "/images/groucho.png",
+    "48": "/images/groucho-48.png",
+    "128": "/images/groucho-128.png"
   }
 }
