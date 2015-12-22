@@ -44,6 +44,15 @@ popluate_selected_fields = (e) ->
   chrome.tabs.executeScript null, {code: js_code}
   window.close()
 
+handle_advanced_events = (e) ->
+  console.log e.target.getAttribute('class')
+  js_code = switch e.target.getAttribute('class')
+    when 'clear-form' then clear_form()
+
+  console.log js_code
+  chrome.tabs.executeScript null, {code: js_code}
+  # window.close()
+
 populate_textareas = ->
   js_code = """
     var i, paragraphs, textareas, _i, _ref;
@@ -58,17 +67,12 @@ populate_textareas = ->
   window.close();
 
 populate_inputs = ->
-  query = ""
-  types = ['text', 'email', 'number', 'password', 'url', 'date']
-  for i in [0..types.length-1]
-    query += "input[type=#{types[i]}], "
-
   js_code = """
     var i, text_arr, inputs, elm, _i, _ref;
 
     text_arr = ["#{marx.marx_json["text"].join("\", \"")}"];
     num_arr = ["#{marx.marx_json["number"].join("\", \"")}"];
-    inputs = document.querySelectorAll('#{query.replace(/,\s$/, '')}');
+    inputs = document.querySelectorAll('#{input_query()}');
     for(var i = 0; i < inputs.length; i++) {
       elm = inputs[i];
       var rand = Math.floor(Math.random() * text_arr.length);
@@ -152,11 +156,44 @@ populate_selects = ->
     }
   """
 
+clear_form = ->
+  # document.querySelectorAll(input_query()).value = ""
+  """
+    var inputs  = document.querySelectorAll('#{input_query()}, textarea'),
+        uncheck = document.querySelectorAll('input[type=checkbox], input[type=radio]'),
+        selects = document.querySelectorAll('select');
+
+    for(var i=0; i<inputs.length; i++)  { inputs[i].value = ""; }
+    for(var j=0; j<uncheck.length; j++) { uncheck[j].checked = false; }
+    for(var s=0; s<selects.length; s++) {
+      var opts = selects[s].options;
+      for(var o=0; o<opts.length; o++) {
+        if(opts[o].defaultSelected) {
+          selects[s].selectedIndex = o;
+          break;
+        }
+      }
+      selects[s].selectedIndex = 0;
+    }
+  """
+
+# HELPER METHODS
+input_query = ->
+  query = ""
+  types = ['text', 'email', 'phone', 'number', 'password', 'url', 'date']
+  for i in [0..types.length-1]
+    query += "input[type=#{types[i]}], "
+  query.replace(/,\s$/, '')
+
 document.addEventListener 'DOMContentLoaded', () ->
   window.marx = new Marx()
 
   standard_links = document.querySelectorAll('.marx-standard-controls a')
+  advanced_links = document.querySelectorAll('.marx-advanced-controls a')
 
   for i in [0..standard_links.length-1]
     standard_links[i].addEventListener 'click', popluate_selected_fields
+
+  for i in [0..advanced_links.length-1]
+    advanced_links[i].addEventListener 'click', handle_advanced_events
 

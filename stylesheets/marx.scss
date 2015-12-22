@@ -18,11 +18,11 @@ body.marx-chrome-extension {
 .marx-js-controls {
   @include clearfix;
   padding: 30px;
-  width: 300px;
+  width: 600px;
   .marx-standard-controls,
   .marx-advanced-controls {
-    // width: 48%;
-    // float: left;
+    width: 48%;
+    float: left;
   }
   .marx-advanced-controls { float: right; }
   h4 { font-size: 24px; margin-bottom: 15px; }

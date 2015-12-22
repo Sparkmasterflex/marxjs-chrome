@@ -16,7 +16,7 @@ body.marx-chrome-extension {
 .marx-js-controls {
   *zoom: 1;
   padding: 30px;
-  width: 300px; }
+  width: 600px; }
   .marx-js-controls:before, .marx-js-controls:after {
     content: " ";
     /* 1 */
@@ -24,6 +24,10 @@ body.marx-chrome-extension {
     /* 2 */ }
   .marx-js-controls:after {
     clear: both; }
+  .marx-js-controls .marx-standard-controls,
+  .marx-js-controls .marx-advanced-controls {
+    width: 48%;
+    float: left; }
   .marx-js-controls .marx-advanced-controls {
     float: right; }
   .marx-js-controls h4 {

@@ -1,4 +1,4 @@
-var popluate_selected_fields, populate_checkboxes, populate_inputs, populate_radios, populate_selects, populate_textareas;
+var clear_form, handle_advanced_events, input_query, popluate_selected_fields, populate_checkboxes, populate_inputs, populate_radios, populate_selects, populate_textareas;
 
 window.Marx = function() {
   return {
@@ -42,6 +42,21 @@ popluate_selected_fields = function(e) {
   return window.close();
 };
 
+handle_advanced_events = function(e) {
+  var js_code;
+  console.log(e.target.getAttribute('class'));
+  js_code = (function() {
+    switch (e.target.getAttribute('class')) {
+      case 'clear-form':
+        return clear_form();
+    }
+  })();
+  console.log(js_code);
+  return chrome.tabs.executeScript(null, {
+    code: js_code
+  });
+};
+
 populate_textareas = function() {
   var js_code;
   js_code = "var i, paragraphs, textareas, _i, _ref;\nparagraphs = [\"" + (marx.marx_json['textarea'].join("\", \"")) + "\"];\ntextareas = document.querySelectorAll('textarea');\nfor (i = _i = 0, _ref = textareas.length-1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {\n  textareas[i].value = paragraphs[Math.floor(Math.random() * paragraphs.length)];\n}";
@@ -52,13 +67,8 @@ populate_textareas = function() {
 };
 
 populate_inputs = function() {
-  var i, js_code, query, types, _i, _ref;
-  query = "";
-  types = ['text', 'email', 'number', 'password', 'url', 'date'];
-  for (i = _i = 0, _ref = types.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-    query += "input[type=" + types[i] + "], ";
-  }
-  js_code = "var i, text_arr, inputs, elm, _i, _ref;\n\ntext_arr = [\"" + (marx.marx_json["text"].join("\", \"")) + "\"];\nnum_arr = [\"" + (marx.marx_json["number"].join("\", \"")) + "\"];\ninputs = document.querySelectorAll('" + (query.replace(/,\s$/, '')) + "');\nfor(var i = 0; i < inputs.length; i++) {\n  elm = inputs[i];\n  var rand = Math.floor(Math.random() * text_arr.length);\n  switch(elm.getAttribute('type')) {\n    case 'text':\n    case 'password':\n      elm.value = text_arr[rand];\n      break;\n    case 'email':\n      var rand_2 = Math.floor(Math.random() * text_arr.length),\n          email = text_arr[rand].toLowerCase().replace(/\\s/g, '') + '@' + text_arr[rand_2].toLowerCase().replace(/\\s/g, '') + '.com';\n      elm.value = email;\n      break;\n    case 'number':\n      elm.value = num_arr[rand];\n      break;\n    case 'url':\n      elm.value = \"http://\" + text_arr[rand].toLowerCase().replace(/\\s/g, '') + \".com\";\n      break;\n    case 'date':\n      elm.value = num_arr[rand] + \"-01-01\";\n      break;\n  }\n}";
+  var js_code;
+  js_code = "var i, text_arr, inputs, elm, _i, _ref;\n\ntext_arr = [\"" + (marx.marx_json["text"].join("\", \"")) + "\"];\nnum_arr = [\"" + (marx.marx_json["number"].join("\", \"")) + "\"];\ninputs = document.querySelectorAll('" + (input_query()) + "');\nfor(var i = 0; i < inputs.length; i++) {\n  elm = inputs[i];\n  var rand = Math.floor(Math.random() * text_arr.length);\n  switch(elm.getAttribute('type')) {\n    case 'text':\n    case 'password':\n      elm.value = text_arr[rand];\n      break;\n    case 'email':\n      var rand_2 = Math.floor(Math.random() * text_arr.length),\n          email = text_arr[rand].toLowerCase().replace(/\\s/g, '') + '@' + text_arr[rand_2].toLowerCase().replace(/\\s/g, '') + '.com';\n      elm.value = email;\n      break;\n    case 'number':\n      elm.value = num_arr[rand];\n      break;\n    case 'url':\n      elm.value = \"http://\" + text_arr[rand].toLowerCase().replace(/\\s/g, '') + \".com\";\n      break;\n    case 'date':\n      elm.value = num_arr[rand] + \"-01-01\";\n      break;\n  }\n}";
   chrome.tabs.executeScript(null, {
     code: js_code
   });
@@ -87,13 +97,31 @@ populate_selects = function() {
   return "var i, js_code, options, rand, selects, _i, _ref;\nselects = document.querySelectorAll('select');\nfor (i = _i = 0, _ref = selects.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {\n  options = selects[i].options;\n  rand = Math.floor(Math.random() * options.length);\n  if ((options[rand].getAttribute('value') != null) && options[rand].getAttribute('value') !== \"\") {\n    options[rand].selected = true;\n  } else {\n    options[rand + 1].selected = true;\n  }\n}";
 };
 
+clear_form = function() {
+  return "var inputs  = document.querySelectorAll('" + (input_query()) + ", textarea'),\n    uncheck = document.querySelectorAll('input[type=checkbox], input[type=radio]'),\n    selects = document.querySelectorAll('select');\n\nfor(var i=0; i<inputs.length; i++)  { inputs[i].value = \"\"; }\nfor(var j=0; j<uncheck.length; j++) { uncheck[j].checked = false; }\nfor(var s=0; s<selects.length; s++) {\n  var opts = selects[s].options;\n  for(var o=0; o<opts.length; o++) {\n    if(opts[o].defaultSelected) {\n      selects[s].selectedIndex = o;\n      break;\n    }\n  }\n  selects[s].selectedIndex = 0;\n}";
+};
+
+input_query = function() {
+  var i, query, types, _i, _ref;
+  query = "";
+  types = ['text', 'email', 'phone', 'number', 'password', 'url', 'date'];
+  for (i = _i = 0, _ref = types.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+    query += "input[type=" + types[i] + "], ";
+  }
+  return query.replace(/,\s$/, '');
+};
+
 document.addEventListener('DOMContentLoaded', function() {
-  var i, standard_links, _i, _ref, _results;
+  var advanced_links, i, standard_links, _i, _j, _ref, _ref1, _results;
   window.marx = new Marx();
   standard_links = document.querySelectorAll('.marx-standard-controls a');
-  _results = [];
+  advanced_links = document.querySelectorAll('.marx-advanced-controls a');
   for (i = _i = 0, _ref = standard_links.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-    _results.push(standard_links[i].addEventListener('click', popluate_selected_fields));
+    standard_links[i].addEventListener('click', popluate_selected_fields);
+  }
+  _results = [];
+  for (i = _j = 0, _ref1 = advanced_links.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
+    _results.push(advanced_links[i].addEventListener('click', handle_advanced_events));
   }
   return _results;
 });
