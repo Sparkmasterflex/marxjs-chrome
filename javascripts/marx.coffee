@@ -188,6 +188,16 @@ input_query = ->
 
 document.addEventListener 'DOMContentLoaded', () ->
   window.marx = new Marx()
+  current_index = 0
+  interval = setInterval ->
+    if current_index < document.querySelectorAll('.marx-js-tips li').length - 1
+      current_index += 1
+    else
+      current_index = 0
+
+    document.querySelector('li.marx-js-current-tip').className = ""
+    document.querySelectorAll('.marx-js-tips li')[current_index].className = "marx-js-current-tip"
+  , 4000
 
   standard_links = document.querySelectorAll('.marx-standard-controls a')
   # advanced_links = document.querySelectorAll('.marx-advanced-controls a')

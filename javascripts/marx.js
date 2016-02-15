@@ -112,8 +112,18 @@ input_query = function() {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-  var i, standard_links, _i, _ref;
+  var current_index, i, interval, standard_links, _i, _ref;
   window.marx = new Marx();
+  current_index = 0;
+  interval = setInterval(function() {
+    if (current_index < document.querySelectorAll('.marx-js-tips li').length - 1) {
+      current_index += 1;
+    } else {
+      current_index = 0;
+    }
+    document.querySelector('li.marx-js-current-tip').className = "";
+    return document.querySelectorAll('.marx-js-tips li')[current_index].className = "marx-js-current-tip";
+  }, 4000);
   standard_links = document.querySelectorAll('.marx-standard-controls a');
   for (i = _i = 0, _ref = standard_links.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
     standard_links[i].addEventListener('click', popluate_selected_fields);

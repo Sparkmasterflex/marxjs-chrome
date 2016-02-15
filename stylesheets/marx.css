@@ -15,7 +15,7 @@ body.marx-chrome-extension {
 
 .marx-js-controls {
   *zoom: 1;
-  padding: 30px;
+  padding: 30px 30px 10px;
   width: 300px; }
   .marx-js-controls:before, .marx-js-controls:after {
     content: " ";
@@ -55,5 +55,25 @@ body.marx-chrome-extension {
     background-color: #ddd; }
     .marx-js-group a:hover {
       background-color: #ccc; }
+
+.marx-js-tips {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-top: 1px solid #eee; }
+  .marx-js-tips .marx-js-groucho {
+    flex-basis: 10%;
+    height: 24px;
+    text-indent: -9999px;
+    overflow: hidden;
+    background: url("/images/groucho-48.png") no-repeat left center;
+    background-size: auto 100%; }
+  .marx-js-tips ul {
+    flex-basis: 90%;
+    margin-left: auto; }
+  .marx-js-tips li {
+    display: none; }
+    .marx-js-tips li.marx-js-current-tip {
+      display: block; }
 
 /*# sourceMappingURL=marx.css.map */
