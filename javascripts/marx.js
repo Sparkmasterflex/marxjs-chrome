@@ -112,16 +112,36 @@ input_query = function() {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-  var advanced_links, i, standard_links, _i, _j, _ref, _ref1, _results;
+  var i, standard_links, _i, _ref;
   window.marx = new Marx();
   standard_links = document.querySelectorAll('.marx-standard-controls a');
-  advanced_links = document.querySelectorAll('.marx-advanced-controls a');
   for (i = _i = 0, _ref = standard_links.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
     standard_links[i].addEventListener('click', popluate_selected_fields);
   }
-  _results = [];
-  for (i = _j = 0, _ref1 = advanced_links.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
-    _results.push(advanced_links[i].addEventListener('click', handle_advanced_events));
-  }
-  return _results;
+  return document.addEventListener("keypress", function(e) {
+    var trigger;
+    trigger = (function() {
+      switch (e.keyCode) {
+        case 97:
+        case 49:
+          return "populate-whole-form";
+        case 98:
+        case 50:
+          return "populate-textareas";
+        case 99:
+        case 51:
+          return "populate-inputs";
+        case 100:
+        case 52:
+          return "populate-checkboxes";
+        case 101:
+        case 53:
+          return "populate-radios";
+        case 102:
+        case 54:
+          return "populate-selects";
+      }
+    })();
+    return document.querySelector("a." + trigger).click();
+  });
 });

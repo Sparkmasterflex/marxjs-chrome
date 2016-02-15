@@ -27,6 +27,7 @@ window.Marx = ->
     radio_buttons: 0
     hidden_fields: 0
 
+
 popluate_selected_fields = (e) ->
   js_code = switch e.target.getAttribute('class')
     when 'populate-textareas'  then populate_textareas()
@@ -189,11 +190,21 @@ document.addEventListener 'DOMContentLoaded', () ->
   window.marx = new Marx()
 
   standard_links = document.querySelectorAll('.marx-standard-controls a')
-  advanced_links = document.querySelectorAll('.marx-advanced-controls a')
+  # advanced_links = document.querySelectorAll('.marx-advanced-controls a')
 
   for i in [0..standard_links.length-1]
     standard_links[i].addEventListener 'click', popluate_selected_fields
 
-  for i in [0..advanced_links.length-1]
-    advanced_links[i].addEventListener 'click', handle_advanced_events
+  # for i in [0..advanced_links.length-1]
+  #   advanced_links[i].addEventListener 'click', handle_advanced_events
 
+
+  document.addEventListener "keypress", (e) ->
+    trigger = switch e.keyCode
+      when 97,  49 then "populate-whole-form" # pressed 1
+      when 98,  50 then "populate-textareas"  # pressed 2
+      when 99,  51 then "populate-inputs"     # pressed 3
+      when 100, 52 then "populate-checkboxes" # pressed 4
+      when 101, 53 then "populate-radios"     # pressed 5
+      when 102, 54 then "populate-selects"    # pressed 6
+    document.querySelector("a.#{trigger}").click()
